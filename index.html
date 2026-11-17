@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1Eksik — Halı Saha Eksik Oyuncu Bulma Platformu</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            pitch: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Özel kaydırma çubuğu ve erişilebilir odak halkaları */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .focus-ring:focus-visible {
+      outline: 3px solid #059669;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Üst Bilgi ve Mod Geçiş Çubuğu -->
+  <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <!-- Marka Logosu -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="relative w-10 h-10 rounded-xl bg-pitch-600 flex items-center justify-center shadow-inner border border-pitch-400/40" aria-hidden="true">
+            <!-- Futbol Sahası / 1Eksik Rozet SVG İkonu -->
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
+            <span class="absolute -top-1.5 -right-1.5 bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.5 rounded-full leading-none shadow">
+              +1
+            </span>
+          </div>
+          <div>
+            <h1 class="text-lg font-extrabold tracking-tight leading-none"><span class="text-pitch-500">1</span>Eksik</h1>
+            <p class="text-xs text-slate-400 mt-0.5">Hızlı Kadro Tamamlama Prototipi</p>
+          </div>
+        </div>
+
+        <!-- Demo Sıfırlama Butonu (Mobil) -->
+        <button
+          type="button"
+          onclick="resetDemoData()"
+          class="sm:hidden text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 focus-ring"
+          title="Demo verilerini başlangıç durumuna döndür"
+        >
+          Sıfırla
+        </button>
+      </div>
+
+      <!-- Ana Navigasyon Sekmeleri -->
+      <nav aria-label="Ana uygulama sekmeleri" class="flex items-center gap-1.5 bg-slate-800 p-1 rounded-xl overflow-x-auto">
+        <button
+          type="button"
+          id="tab-captain"
+          onclick="switchTab('captain')"
+          aria-pressed="true"
+          class="flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring bg-pitch-600 text-white shadow"
+        >
+          Kaptan Modu
+        </button>
+        <button
+          type="button"
+          id="tab-player"
+          onclick="switchTab('player')"
+          aria-pressed="false"
+          class="flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring text-slate-300 hover:text-white hover:bg-slate-700/60"
+        >
+          Oyuncu Modu
+        </button>
+        <button
+          type="button"
+          id="tab-invites"
+          onclick="switchTab('invites')"
+          aria-pressed="false"
+          class="relative flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center justify-center gap-1.5"
+        >
+          <span>Davetler</span>
+          <span
+            id="badge-invites"
+            class="hidden bg-amber-500 text-slate-950 text-[11px] font-extrabold px-1.5 py-0.5 rounded-full leading-none"
+          >0</span>
+        </button>
+        <button
+          type="button"
+          id="tab-chat"
+          onclick="switchTab('chat')"
+          aria-pressed="false"
+          class="relative flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center justify-center gap-1.5"
+        >
+          <span>Sohbetler</span>
+          <span
+            id="badge-chats"
+            class="hidden bg-pitch-500 text-slate-950 text-[11px] font-extrabold px-1.5 py-0.5 rounded-full leading-none"
+          >0</span>
+        </button>
+      </nav>
+
+      <!-- Demo Sıfırlama Butonu (Masaüstü) -->
+      <button
+        type="button"
+        onclick="resetDemoData()"
+        class="hidden sm:inline-flex text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition focus-ring"
+        title="Tüm test verilerini başlangıç durumuna döndür"
+      >
+        Demoyu Sıfırla
+      </button>
+    </div>
+  </header>
+
+  <!-- Canlı Bildirim / Toast Mesaj Alanı -->
+  <div id="toast-container" aria-live="polite" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Ana İçerik Konteyneri -->
+  <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-6">
+
+    <!-- ========================================================= -->
+    <!-- 1. SEKME: KAPTAN MODU (OYUNCU ARA & DAVET GÖNDER)          -->
+    <!-- ========================================================= -->
+    <section id="view-captain" aria-labelledby="heading-captain" class="space-y-6">
+      <!-- Kaptan Arama ve Kriter Belirleme Kartı -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <span class="inline-block text-xs font-bold uppercase tracking-wider text-pitch-700 bg-pitch-50 px-2.5 py-1 rounded-lg border border-pitch-200 mb-1">
+              Kaptan Modu
+            </span>
+            <h2 id="heading-captain" class="text-xl font-bold text-slate-900">Eksik Oyuncu Bul</h2>
+          </div>
+          <p class="text-xs text-slate-500">Kriterlerine uygun müsait oyuncuları seçip davet gönder.</p>
+        </div>
+
+        <form id="captain-filter-form" onsubmit="event.preventDefault(); renderCaptainPlayers();" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- İl Seçimi -->
+          <div>
+            <label for="cap-city" class="block text-sm font-semibold text-slate-700 mb-1.5">İl</label>
+            <select id="cap-city" onchange="handleCaptainCityChange()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+              <option value="İzmir">İzmir</option>
+              <option value="Ankara">Ankara</option>
+              <option value="İstanbul (Anadolu)">İstanbul (Anadolu)</option>
+              <option value="İstanbul (Avrupa)">İstanbul (Avrupa)</option>
+            </select>
+          </div>
+
+          <!-- İlçe Seçimi -->
+          <div>
+            <label for="cap-district" class="block text-sm font-semibold text-slate-700 mb-1.5">İlçe</label>
+            <select id="cap-district" onchange="renderCaptainPlayers()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+              <!-- JS tarafından dinamik doldurulacak -->
+            </select>
+          </div>
+
+          <!-- Halı Saha Adı -->
+          <div>
+            <label for="cap-pitch" class="block text-sm font-semibold text-slate-700 mb-1.5">Halı Saha Adı</label>
+            <input
+              type="text"
+              id="cap-pitch"
+              value="Ege Arena Halı Saha"
+              placeholder="Örn: Yıldız Spor Tesisleri"
+              class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring"
+            />
+          </div>
+
+          <!-- Aranan Mevki -->
+          <div>
+            <label for="cap-position" class="block text-sm font-semibold text-slate-700 mb-1.5">Aranan Mevki</label>
+            <select id="cap-position" onchange="renderCaptainPlayers()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+              <option value="ALL">Fark Etmez (Tüm Mevkiler)</option>
+              <option value="Kaleci">Kaleci</option>
+              <option value="Defans">Defans</option>
+              <option value="Orta Saha">Orta Saha</option>
+              <option value="Forvet">Forvet</option>
+            </select>
+          </div>
+
+          <!-- Maç Tarihi ve Saati (Önce Gün, Altta Saat Aralığı Seçenekleri) -->
+          <div class="sm:col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <label for="cap-day" class="block text-sm font-bold text-slate-800">Maç Günü & Saat Aralığı</label>
+              <select id="cap-day" onchange="renderCaptainPlayers()" class="sm:w-52 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-900 focus-ring">
+                <option value="Bugün" selected>Bugün</option>
+                <option value="Yarın">Yarın</option>
+                <option value="Cuma">Cuma</option>
+                <option value="Cumartesi">Cumartesi</option>
+                <option value="Pazar">Pazar</option>
+                <option value="Hafta İçi">Hafta İçi</option>
+              </select>
+            </div>
+
+            <div>
+              <span class="block text-xs font-semibold text-slate-500 mb-2">Saat Aralığı Seçin:</span>
+              <div id="cap-time-pills" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <!-- JS tarafından müsaitlik saatleriyle aynı seçeneklerle doldurulacak -->
+              </div>
+              <input type="hidden" id="cap-time" value="21:00 - 23:00" />
+            </div>
+          </div>
+
+          <!-- Davet Yanıt Süresi -->
+          <div class="sm:col-span-2 bg-amber-50/80 border border-amber-200 rounded-xl p-3.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label for="cap-timeout" class="block text-sm font-bold text-amber-950">
+                  Davet Yanıt Süresi
+                </label>
+                <p class="text-xs text-amber-800 mt-0.5">
+                  Oyuncu seçtiğiniz süre içinde onay vermezse davet otomatik olarak zaman aşımına uğrar.
+                </p>
+              </div>
+              <select id="cap-timeout" class="sm:w-44 rounded-xl border border-amber-300 bg-white px-3.5 py-2.5 text-sm font-bold text-slate-900 focus-ring">
+                <option value="30">30 Dakika (Acil)</option>
+                <option value="60" selected>60 Dakika</option>
+                <option value="90">90 Dakika</option>
+                <option value="120">120 Dakika</option>
+                <option value="180">180 Dakika</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Müsait Oyuncular Listesi Başlığı -->
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-800">
+          Havuzdaki Müsait Oyuncular
+          <span id="available-count" class="ml-1.5 text-xs font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
+        </h3>
+        <span class="text-xs text-slate-500">Güvenilirlik puanına göre sıralı</span>
+      </div>
+
+      <!-- Oyuncu Kartları Konteyneri -->
+      <div id="captain-players-list" class="grid grid-cols-1 gap-4"></div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 2. SEKME: OYUNCU MODU (MÜSAİTLİK AÇMA & PROFİL AYARLARI)   -->
+    <!-- ========================================================= -->
+    <section id="view-player" aria-labelledby="heading-player" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-slate-100">
+          <div>
+            <span class="inline-block text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 mb-1">
+              Oyuncu Modu
+            </span>
+            <h2 id="heading-player" class="text-xl font-bold text-slate-900">Müsaitlik Durumum</h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Müsaitliği açtığında profilin Kaptan Modu havuzuna anında eklenir.
+            </p>
+          </div>
+
+          <!-- Müsaitim Anahtarı (Accessible Switch) -->
+          <div class="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200">
+            <span id="availability-status-label" class="text-sm font-bold text-pitch-700">Müsaitim</span>
+            <button
+              type="button"
+              id="player-available-toggle"
+              role="switch"
+              aria-checked="true"
+              onclick="togglePlayerAvailability()"
+              class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-pitch-600 focus-ring"
+            >
+              <span class="sr-only">Havuzda görünme durumunu değiştir</span>
+              <span
+                id="player-toggle-knob"
+                class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"
+              ></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Oyuncu Profili & Müsaitlik Formu -->
+        <form id="player-profile-form" onsubmit="savePlayerProfile(event)" class="mt-5 space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Oyuncu Adı -->
+            <div class="sm:col-span-2">
+              <label for="pl-name" class="block text-sm font-semibold text-slate-700 mb-1.5">Ad Soyad / Takma Ad</label>
+              <input
+                type="text"
+                id="pl-name"
+                required
+                class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring"
+              />
+            </div>
+
+            <!-- Müsait Olduğu İl -->
+            <div>
+              <label for="pl-city" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Olduğun İl</label>
+              <select id="pl-city" onchange="handlePlayerCityChange()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+                <option value="İzmir">İzmir</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İstanbul (Anadolu)">İstanbul (Anadolu)</option>
+                <option value="İstanbul (Avrupa)">İstanbul (Avrupa)</option>
+              </select>
+            </div>
+
+            <!-- Müsait Olduğu İlçe -->
+            <div>
+              <label for="pl-district" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Olduğun İlçe</label>
+              <select id="pl-district" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+                <!-- JS tarafından dinamik doldurulacak -->
+              </select>
+            </div>
+
+            <!-- Tarih Seçimi -->
+            <div>
+              <label for="pl-date" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Gün</label>
+              <select id="pl-date" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+                <option value="Bugün">Bugün</option>
+                <option value="Yarın">Yarın</option>
+                <option value="Cuma">Cuma</option>
+                <option value="Cumartesi">Cumartesi</option>
+                <option value="Pazar">Pazar</option>
+                <option value="Hafta İçi">Hafta İçi</option>
+                <option value="Her Gün">Her Gün</option>
+              </select>
+            </div>
+
+            <!-- Saat Aralığı -->
+            <div>
+              <label for="pl-time" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Saat Aralığı</label>
+              <select id="pl-time" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+                <option value="08:00 - 19:00">08:00 - 19:00 (Sabah - Akşamüstü)</option>
+                <option value="19:00 - 21:00">19:00 - 21:00</option>
+                <option value="21:00 - 23:00">21:00 - 23:00</option>
+                <option value="23:00 - 01:00">23:00 - 01:00</option>
+                <option value="Tüm Gün (08:00 - 01:00)">Tüm Gün (08:00 - 01:00)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Oynayabildiği Mevkiler (Yalnızca Orta Saha & Forvet birlikte seçilebilir) -->
+          <div>
+            <span class="block text-sm font-semibold text-slate-700 mb-2">Oynayabildiğin Mevkiler <span class="text-xs font-normal text-slate-500">(Sadece Orta Saha & Forvet birlikte seçilebilir)</span></span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="pl-positions-group">
+              <label class="cursor-pointer">
+                <input type="checkbox" name="pl-pos" value="Kaleci" onchange="handlePlayerPositionChange('Kaleci')" class="peer sr-only" />
+                <div class="text-center py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700 peer-checked:bg-pitch-600 peer-checked:text-white peer-checked:border-pitch-600 transition">
+                  Kaleci
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" name="pl-pos" value="Defans" onchange="handlePlayerPositionChange('Defans')" class="peer sr-only" />
+                <div class="text-center py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700 peer-checked:bg-pitch-600 peer-checked:text-white peer-checked:border-pitch-600 transition">
+                  Defans
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" name="pl-pos" value="Orta Saha" onchange="handlePlayerPositionChange('Orta Saha')" class="peer sr-only" checked />
+                <div class="text-center py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700 peer-checked:bg-pitch-600 peer-checked:text-white peer-checked:border-pitch-600 transition">
+                  Orta Saha
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" name="pl-pos" value="Forvet" onchange="handlePlayerPositionChange('Forvet')" class="peer sr-only" />
+                <div class="text-center py-2.5 px-3 rounded-xl border border-slate-300 bg-slate-50 text-sm font-semibold text-slate-700 peer-checked:bg-pitch-600 peer-checked:text-white peer-checked:border-pitch-600 transition">
+                  Forvet
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mevkiye Göre Dinamik Oyun Tarzı -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="pl-style" class="block text-sm font-semibold text-slate-700">Oyun Tarzı</label>
+              <span id="pl-style-pos-hint" class="text-xs font-semibold text-pitch-700 bg-pitch-50 px-2 py-0.5 rounded-md border border-pitch-200">
+                Orta Saha Rolleri
+              </span>
+            </div>
+            <select id="pl-style" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
+              <!-- JS tarafından seçili mevkiye göre dinamik doldurulacak -->
+            </select>
+          </div>
+
+          <!-- Kaydet Butonu -->
+          <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-xs text-slate-500">
+              Güvenilirlik Puanın: <strong class="text-slate-800">4.9 / 5.0</strong> (18 Maç • %100 Katılım)
+            </div>
+            <button
+              type="submit"
+              class="w-full sm:w-auto px-6 py-3 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white font-bold text-sm shadow-sm transition focus-ring"
+            >
+              Müsaitlik Ayarlarını Kaydet
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 3. SEKME: DAVETLER & GERİ SAYIM AKIŞI (DOUBLE OPT-IN)     -->
+    <!-- ========================================================= -->
+    <section id="view-invites" aria-labelledby="heading-invites" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <h2 id="heading-invites" class="text-xl font-bold text-slate-900">Maç Davetleri ve Onay Akışı</h2>
+        <p class="text-xs text-slate-600 mt-1">
+          Kaptan olarak gönderdiğin veya oyuncu olarak aldığın davetlerin canlı geri sayımını buradan yönetebilir,
+          <strong>Demo Simülasyon</strong> butonlarıyla oyuncu onayını veya zaman aşımını anında test edebilirsin.
+        </p>
+      </div>
+
+      <div id="invites-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 4. SEKME: UYGULAMA İÇİ MAÇ SOHBETİ (CHAT)                 -->
+    <!-- ========================================================= -->
+    <section id="view-chat" aria-labelledby="heading-chat" class="hidden space-y-4">
+      <!-- Aktif Eşleşmeler Listesi -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+        <h2 id="heading-chat" class="text-base font-bold text-slate-900 mb-3">Onaylanan Maç Odaları</h2>
+        <div id="chat-rooms-selector" class="flex gap-2 overflow-x-auto pb-1"></div>
+      </div>
+
+      <!-- Aktif Sohbet Penceresi -->
+      <div id="active-chat-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col"></div>
+    </section>
+
+  </main>
+
+  <!-- Alt Bilgi -->
+  <footer class="max-w-3xl w-full mx-auto px-4 py-6 text-center text-xs text-slate-400">
+    1Eksik MVP Prototipi • Çift Taraflı Onay (Double Opt-In) & Özelleştirilebilir Zaman Aşımı Mimarisi
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT UYGULAMA MANTIĞI                              -->
+  <!-- ========================================================= -->
+  <script>
+    const STORAGE_KEY = '1eksik_prototype_state_v3';
+
+    // Başlangıç Müsait Oyuncu Havuzu
+    const INITIAL_PLAYERS = [
+      {
+        id: 'pl-self',
+        isSelf: true,
+        name: 'Burak Kaya (Sen)',
+        city: 'İzmir',
+        district: 'Bornova',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Orta Saha'],
+        primaryPosition: 'Orta Saha',
+        style: 'Box-to-Box (İki Yönlü Dinamik)',
+        rating: 4.9,
+        matches: 18,
+        available: true
+      },
+      {
+        id: 'pl-1',
+        isSelf: false,
+        name: 'Emre Yıldırım',
+        city: 'İzmir',
+        district: 'Bornova',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Kaleci'],
+        primaryPosition: 'Kaleci',
+        style: 'Önde & Libero Kaleci',
+        rating: 4.9,
+        matches: 42,
+        available: true
+      },
+      {
+        id: 'pl-2',
+        isSelf: false,
+        name: 'Mert Can Özkan',
+        city: 'İzmir',
+        district: 'Karşıyaka',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Defans'],
+        primaryPosition: 'Defans',
+        style: 'Müdahaleden Kaçınmaz',
+        rating: 4.8,
+        matches: 31,
+        available: true
+      },
+      {
+        id: 'pl-3',
+        isSelf: false,
+        name: 'Kaan Demirtaş',
+        city: 'İzmir',
+        district: 'Buca',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Orta Saha', 'Forvet'],
+        primaryPosition: 'Orta Saha',
+        style: 'Maestro / Oyun Kurucu',
+        rating: 4.7,
+        matches: 24,
+        available: true
+      },
+      {
+        id: 'pl-4',
+        isSelf: false,
+        name: 'Oğuzhan Arslan',
+        city: 'İzmir',
+        district: 'Bornova',
+        date: 'Bugün',
+        time: '19:00 - 21:00',
+        positions: ['Forvet'],
+        primaryPosition: 'Forvet',
+        style: 'Bitirici Santrfor',
+        rating: 4.8,
+        matches: 29,
+        available: true
+      },
+      {
+        id: 'pl-5',
+        isSelf: false,
+        name: 'Tolga Şahin',
+        city: 'İzmir',
+        district: 'Alsancak',
+        date: 'Yarın',
+        time: '21:00 - 23:00',
+        positions: ['Defans'],
+        primaryPosition: 'Defans',
+        style: 'Geriden Oyun Kurucu',
+        rating: 4.6,
+        matches: 15,
+        available: true
+      },
+      {
+        id: 'pl-6',
+        isSelf: false,
+        name: 'Kerem Aydın',
+        city: 'Ankara',
+        district: 'Çankaya',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Kaleci'],
+        primaryPosition: 'Kaleci',
+        style: 'Çizgide & Risksiz Sabit',
+        rating: 4.9,
+        matches: 51,
+        available: true
+      },
+      {
+        id: 'pl-7',
+        isSelf: false,
+        name: 'Alperen Koç',
+        city: 'İstanbul (Anadolu)',
+        district: 'Kadıköy',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Orta Saha', 'Forvet'],
+        primaryPosition: 'Forvet',
+        style: 'Hızlı Kontra & Kanat Forvet',
+        rating: 4.8,
+        matches: 34,
+        available: true
+      },
+      {
+        id: 'pl-8',
+        isSelf: false,
+        name: 'Sinan Yılmaz',
+        city: 'İstanbul (Avrupa)',
+        district: 'Beşiktaş',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Defans'],
+        primaryPosition: 'Defans',
+        style: 'Duvar Stoper',
+        rating: 4.7,
+        matches: 27,
+        available: true
+      },
+      {
+        id: 'pl-9',
+        isSelf: false,
+        name: 'Barış Çelik',
+        city: 'İstanbul (Avrupa)',
+        district: 'Şişli',
+        date: 'Bugün',
+        time: '23:00 - 01:00',
+        positions: ['Defans'],
+        primaryPosition: 'Defans',
+        style: 'İki Yönlü Bek',
+        rating: 4.6,
+        matches: 19,
+        available: true
+      },
+      {
+        id: 'pl-10',
+        isSelf: false,
+        name: 'Yusuf Aksoy',
+        city: 'İzmir',
+        district: 'Bornova',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Defans'],
+        primaryPosition: 'Defans',
+        style: 'Duvar Stoper',
+        rating: 4.9,
+        matches: 38,
+        available: true
+      },
+      {
+        id: 'pl-11',
+        isSelf: false,
+        name: 'Caner Güler',
+        city: 'İzmir',
+        district: 'Bornova',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Forvet', 'Orta Saha'],
+        primaryPosition: 'Forvet',
+        style: 'Hızlı Kontra & Kanat Forvet',
+        rating: 4.7,
+        matches: 22,
+        available: true
+      },
+      {
+        id: 'pl-12',
+        isSelf: false,
+        name: 'Furkan Taş',
+        city: 'İzmir',
+        district: 'Konak',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Orta Saha'],
+        primaryPosition: 'Orta Saha',
+        style: 'Maestro / Oyun Kurucu',
+        rating: 4.8,
+        matches: 30,
+        available: true
+      },
+      {
+        id: 'pl-13',
+        isSelf: false,
+        name: 'Berkay Deniz',
+        city: 'İzmir',
+        district: 'Karşıyaka',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Kaleci'],
+        primaryPosition: 'Kaleci',
+        style: 'Çizgide & Risksiz Sabit',
+        rating: 4.9,
+        matches: 45,
+        available: true
+      },
+      {
+        id: 'pl-14',
+        isSelf: false,
+        name: 'Eren Karahan',
+        city: 'Ankara',
+        district: 'Çankaya',
+        date: 'Bugün',
+        time: '21:00 - 23:00',
+        positions: ['Orta Saha', 'Forvet'],
+        primaryPosition: 'Orta Saha',
+        style: 'Box-to-Box (İki Yönlü Dinamik)',
+        rating: 4.8,
+        matches: 25,
+        available: true
+      }
+    ];
+
+    // Başlangıç Örnek Davetler ve Hazır Sohbet Odaları
+    function createInitialState() {
+      const now = Date.now();
+      return {
+        activeTab: 'captain',
+        activePrimaryPosition: 'Orta Saha',
+        players: JSON.parse(JSON.stringify(INITIAL_PLAYERS)),
+        invites: [
+          {
+            id: 'inv-demo-1',
+            direction: 'incoming',
+            captainName: 'Kaptan Serkan (Bornova Gücü)',
+            playerId: 'pl-self',
+            playerName: 'Burak Kaya (Sen)',
+            pitchName: 'Bornova Olimpik Halı Saha',
+            city: 'İzmir',
+            district: 'Bornova',
+            matchTime: 'Bugün • 21:00 - 23:00',
+            position: 'Orta Saha',
+            timeoutMinutes: 60,
+            expiresAt: now + 54 * 60 * 1000,
+            status: 'pending'
+          },
+          {
+            id: 'inv-demo-2',
+            direction: 'outgoing',
+            captainName: 'Sen (Takım Kaptanı)',
+            playerId: 'pl-1',
+            playerName: 'Emre Yıldırım',
+            pitchName: 'Ege Arena Halı Saha',
+            city: 'İzmir',
+            district: 'Bornova',
+            matchTime: 'Bugün • 21:00 - 23:00',
+            position: 'Kaleci',
+            timeoutMinutes: 30,
+            expiresAt: now + 26 * 60 * 1000,
+            status: 'pending'
+          },
+          {
+            id: 'inv-demo-3',
+            direction: 'incoming',
+            captainName: 'Kaptan Onur (Karşıyaka FK)',
+            playerId: 'pl-self',
+            playerName: 'Burak Kaya (Sen)',
+            pitchName: 'Bostanlı Arena Tesisleri',
+            city: 'İzmir',
+            district: 'Karşıyaka',
+            matchTime: 'Yarın • 19:00 - 21:00',
+            position: 'Orta Saha',
+            timeoutMinutes: 90,
+            expiresAt: now + 82 * 60 * 1000,
+            status: 'pending'
+          },
+          {
+            id: 'inv-demo-4',
+            direction: 'outgoing',
+            captainName: 'Sen (Takım Kaptanı)',
+            playerId: 'pl-2',
+            playerName: 'Mert Can Özkan',
+            pitchName: 'Ege Arena Halı Saha',
+            city: 'İzmir',
+            district: 'Karşıyaka',
+            matchTime: 'Bugün • 21:00 - 23:00',
+            position: 'Defans',
+            timeoutMinutes: 60,
+            expiresAt: now - 5 * 60 * 1000,
+            status: 'accepted'
+          },
+          {
+            id: 'inv-demo-5',
+            direction: 'outgoing',
+            captainName: 'Sen (Takım Kaptanı)',
+            playerId: 'pl-12',
+            playerName: 'Furkan Taş',
+            pitchName: 'Alsancak Spor Kompleksi',
+            city: 'İzmir',
+            district: 'Konak',
+            matchTime: 'Cuma • 21:00 - 23:00',
+            position: 'Orta Saha',
+            timeoutMinutes: 60,
+            expiresAt: now - 10 * 60 * 1000,
+            status: 'accepted'
+          }
+        ],
+        chats: [
+          {
+            id: 'chat-inv-demo-4',
+            inviteId: 'inv-demo-4',
+            pitchName: 'Ege Arena Halı Saha',
+            matchTime: 'Bugün • 21:00 - 23:00',
+            position: 'Defans',
+            partnerName: 'Mert Can Özkan',
+            playerId: 'pl-2',
+            ibanShared: false,
+            reliabilityVerified: false,
+            usedReplyIndices: [0],
+            messages: [
+              {
+                sender: 'system',
+                text: 'Eşleşme onaylandı! Mert Can Özkan kadroya dahil oldu.',
+                time: '19:40'
+              },
+              {
+                sender: 'partner',
+                text: 'Selam kaptan, daveti onayladım. Akşamki maç için 1 stoper eksiğiniz tamam, sahada görüşürüz!',
+                time: '19:41'
+              },
+              {
+                sender: 'me',
+                text: 'Eyvallah Mert, hoş geldin. Maçtan 15 dk önce tesiste olmaya çalışalım.',
+                time: '19:43'
+              },
+              {
+                sender: 'partner',
+                text: 'Tamamdır kaptan, not aldım. Maç saatinden 15 dakika önce sahada olurum! Ücret ve IBAN bilgisini de atabilir misin?',
+                time: '19:44'
+              }
+            ]
+          },
+          {
+            id: 'chat-inv-demo-5',
+            inviteId: 'inv-demo-5',
+            pitchName: 'Alsancak Spor Kompleksi',
+            matchTime: 'Cuma • 21:00 - 23:00',
+            position: 'Orta Saha',
+            partnerName: 'Furkan Taş',
+            playerId: 'pl-12',
+            ibanShared: true,
+            reliabilityVerified: false,
+            usedReplyIndices: [2],
+            messages: [
+              {
+                sender: 'system',
+                text: 'Eşleşme onaylandı! Furkan Taş kadroya dahil oldu.',
+                time: '18:15'
+              },
+              {
+                sender: 'me',
+                text: '📋 Maç Detayları:\n• Saha: Alsancak Spor Kompleksi\n• Saat: Cuma • 21:00 - 23:00\n• Kişi Başı Ücret: 180 TL\n• IBAN: TR45 0006 2000 0000 1234 5678 90\n• Not: Maçtan 15 dk önce sahada olalım.',
+                time: '18:16'
+              },
+              {
+                sender: 'partner',
+                text: 'IBAN bilgisini aldım, birazdan payıma düşeni gönderip dekontu atarım. Forma rengi ne giyiyoruz?',
+                time: '18:18'
+              }
+            ]
+          }
+        ],
+        activeChatId: 'chat-inv-demo-4'
+      };
+    }
+
+    let appState = loadState();
+    let timerInterval = null;
+
+    // İl -> İlçe Seçenekleri
+    const CITY_DISTRICTS = {
+      'İzmir': ['Tümü', 'Bornova', 'Karşıyaka', 'Konak', 'Buca', 'Alsancak', 'Bayraklı', 'Gaziemir'],
+      'Ankara': ['Tümü', 'Çankaya', 'Yenimahalle', 'Keçiören', 'Etimesgut', 'Mamak'],
+      'İstanbul (Anadolu)': ['Tümü', 'Kadıköy', 'Ataşehir', 'Üsküdar', 'Maltepe', 'Kartal', 'Pendik'],
+      'İstanbul (Avrupa)': ['Tümü', 'Beşiktaş', 'Şişli', 'Bakırköy', 'Sarıyer', 'Bahçelievler', 'Başakşehir']
+    };
+
+    // Mevkiye Göre Dinamik Oyun Tarzları
+    const POSITION_STYLES = {
+      'Kaleci': ['Önde & Libero Kaleci', 'Çizgide & Risksiz Sabit'],
+      'Defans': ['Müdahaleden Kaçınmaz', 'Geriden Oyun Kurucu', 'Duvar Stoper', 'İki Yönlü Bek'],
+      'Orta Saha': ['Maestro / Oyun Kurucu', 'Box-to-Box (İki Yönlü Dinamik)', 'Ön Libero / Kesici', 'Ofansif Oyun Kurucu'],
+      'Forvet': ['Bitirici Santrfor', 'Hızlı Kontra & Kanat Forvet', 'Pivot Santrfor', 'Pres Yapan Forvet']
+    };
+
+    const MATCH_TIME_SLOTS = [
+      '08:00 - 19:00',
+      '19:00 - 21:00',
+      '21:00 - 23:00',
+      '23:00 - 01:00'
+    ];
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {
+        console.error('Depolama okuma hatası:', e);
+      }
+      return createInitialState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error('Depolama yazma hatası:', e);
+      }
+      updateBadges();
+    }
+
+    function resetDemoData() {
+      appState = createInitialState();
+      saveState();
+      initUI();
+      showToast('Demo verileri başlangıç durumuna sıfırlandı.', 'info');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-slate-900 text-white border-pitch-500',
+        warning: 'bg-amber-950 text-amber-100 border-amber-500',
+        info: 'bg-blue-950 text-blue-100 border-blue-500'
+      };
+      toast.className = `pointer-events-auto border-l-4 ${colors[type] || colors.success} px-4 py-3 rounded-xl shadow-lg text-xs sm:text-sm font-medium transition-all duration-300`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function updateBadges() {
+      const pendingInvites = appState.invites.filter(i => i.status === 'pending').length;
+      const invBadge = document.getElementById('badge-invites');
+      if (invBadge) {
+        invBadge.textContent = pendingInvites;
+        invBadge.classList.toggle('hidden', pendingInvites === 0);
+      }
+
+      const chatBadge = document.getElementById('badge-chats');
+      if (chatBadge) {
+        chatBadge.textContent = appState.chats.length;
+        chatBadge.classList.toggle('hidden', appState.chats.length === 0);
+      }
+    }
+
+    function switchTab(tabName) {
+      appState.activeTab = tabName;
+      const tabs = ['captain', 'player', 'invites', 'chat'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const view = document.getElementById(`view-${t}`);
+        const isActive = t === tabName;
+        if (btn) {
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          btn.className = isActive
+            ? 'flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring bg-pitch-600 text-white shadow flex items-center justify-center gap-1.5'
+            : 'flex-1 sm:flex-none px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap focus-ring text-slate-300 hover:text-white hover:bg-slate-700/60 flex items-center justify-center gap-1.5';
+        }
+        if (view) {
+          view.classList.toggle('hidden', !isActive);
+        }
+      });
+
+      if (tabName === 'captain') renderCaptainPlayers();
+      if (tabName === 'player') syncPlayerFormUI();
+      if (tabName === 'invites') renderInvites();
+      if (tabName === 'chat') renderChats();
+    }
+
+    // Kaptan Modu: İl değiştiğinde ilçeleri güncelle
+    function handleCaptainCityChange() {
+      const city = document.getElementById('cap-city').value;
+      const districtSelect = document.getElementById('cap-district');
+      const districts = CITY_DISTRICTS[city] || ['Tümü'];
+      districtSelect.innerHTML = districts
+        .map(d => `<option value="${d}">${d === 'Tümü' ? 'Tüm İlçeler' : d}</option>`)
+        .join('');
+      renderCaptainPlayers();
+    }
+
+    // Kaptan Modu: Saat Aralığı Seçim Butonları
+    function renderCaptainTimePills() {
+      const container = document.getElementById('cap-time-pills');
+      const hiddenInput = document.getElementById('cap-time');
+      if (!container || !hiddenInput) return;
+
+      const selectedTime = hiddenInput.value || '21:00 - 23:00';
+      container.innerHTML = MATCH_TIME_SLOTS.map(slot => {
+        const active = slot === selectedTime;
+        return `
+          <button
+            type="button"
+            onclick="selectCaptainTime('${slot}')"
+            class="px-3 py-2 rounded-xl text-xs font-bold border transition focus-ring ${
+              active
+                ? 'bg-pitch-600 text-white border-pitch-600 shadow-sm'
+                : 'bg-white text-slate-700 border-slate-300 hover:border-pitch-500'
+            }"
+          >
+            ${slot}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectCaptainTime(slot) {
+      document.getElementById('cap-time').value = slot;
+      renderCaptainTimePills();
+      renderCaptainPlayers();
+    }
+
+    // Kaptan Modu: Uygun Oyuncuları Filtrele ve Listele
+    function renderCaptainPlayers() {
+      const listEl = document.getElementById('captain-players-list');
+      const countEl = document.getElementById('available-count');
+      if (!listEl) return;
+
+      const city = document.getElementById('cap-city').value;
+      const district = document.getElementById('cap-district').value;
+      const position = document.getElementById('cap-position').value;
+      const day = document.getElementById('cap-day').value;
+      const timeSlot = document.getElementById('cap-time').value;
+
+      const filtered = appState.players
+        .filter(p => p.available)
+        .filter(p => p.city === city)
+        .filter(p => !district || district === 'Tümü' || p.district === district)
+        .filter(p => position === 'ALL' || p.positions.includes(position))
+        .filter(p => p.date === 'Her Gün' || p.date === day || (day === 'Hafta İçi' && ['Bugün', 'Yarın', 'Cuma'].includes(p.date)))
+        .filter(p => p.time.startsWith('Tüm Gün') || p.time === timeSlot)
+        .sort((a, b) => b.rating - a.rating);
+
+      if (countEl) countEl.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
+            <p class="text-sm font-bold text-slate-700">Seçilen kriterlere uygun müsait oyuncu bulunamadı.</p>
+            <p class="text-xs text-slate-500 mt-1">İlçe seçimini "Tüm İlçeler" yapabilir veya farklı bir saat aralığı deneyebilirsin.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(player => {
+        const alreadyInvited = appState.invites.some(
+          inv => inv.playerId === player.id && inv.status === 'pending' && inv.direction === 'outgoing'
+        );
+        const alreadyAccepted = appState.invites.some(
+          inv => inv.playerId === player.id && inv.status === 'accepted'
+        );
+
+        let actionButton = `
+          <button
+            type="button"
+            onclick="sendInviteToPlayer('${player.id}')"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold shadow-sm transition focus-ring"
+          >
+            Maça Davet Et
+          </button>
+        `;
+
+        if (player.isSelf) {
+          actionButton = `
+            <span class="inline-block px-3 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
+              Senin Profilin (Havuzda Aktif)
+            </span>
+          `;
+        } else if (alreadyAccepted) {
+          actionButton = `
+            <button
+              type="button"
+              onclick="switchTab('chat')"
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold transition focus-ring"
+            >
+              Kadronuzda • Sohbete Git
+            </button>
+          `;
+        } else if (alreadyInvited) {
+          actionButton = `
+            <button
+              type="button"
+              onclick="switchTab('invites')"
+              class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition focus-ring"
+            >
+              Davet Gönderildi (Yanıt Bekleniyor)
+            </button>
+          `;
+        }
+
+        return `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-pitch-300 transition">
+            <div class="space-y-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <h4 class="text-base font-extrabold text-slate-900">${player.name}</h4>
+                <span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  ★ ${player.rating.toFixed(1)} <span class="font-normal text-amber-700">(${player.matches} maç)</span>
+                </span>
+                <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg">
+                  ${player.city} / ${player.district}
+                </span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${player.positions.map(pos => `
+                  <span class="text-xs font-bold bg-pitch-50 text-pitch-800 border border-pitch-200 px-2.5 py-0.5 rounded-lg">
+                    ${pos}
+                  </span>
+                `).join('')}
+                <span class="text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-lg">
+                  Rol: ${player.style}
+                </span>
+              </div>
+
+              <p class="text-xs text-slate-500">
+                Müsaitlik: <strong class="text-slate-700">${player.date} • ${player.time}</strong>
+              </p>
+            </div>
+
+            <div class="shrink-0">
+              ${actionButton}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Kaptan Modu: Oyuncuya Davet Gönder
+    function sendInviteToPlayer(playerId) {
+      const player = appState.players.find(p => p.id === playerId);
+      if (!player || !player.available) {
+        showToast('Bu oyuncu şu anda müsait değil.', 'warning');
+        return;
+      }
+
+      const pitchName = document.getElementById('cap-pitch').value.trim() || 'Belirtilmemiş Halı Saha';
+      const city = document.getElementById('cap-city').value;
+      const district = document.getElementById('cap-district').value === 'Tümü' ? player.district : document.getElementById('cap-district').value;
+      const day = document.getElementById('cap-day').value;
+      const timeSlot = document.getElementById('cap-time').value;
+      const selectedPos = document.getElementById('cap-position').value;
+      const timeoutMinutes = parseInt(document.getElementById('cap-timeout').value, 10) || 60;
+
+      const newInvite = {
+        id: 'inv-' + Date.now(),
+        direction: 'outgoing',
+        captainName: 'Sen (Takım Kaptanı)',
+        playerId: player.id,
+        playerName: player.name,
+        pitchName,
+        city,
+        district,
+        matchTime: `${day} • ${timeSlot}`,
+        position: selectedPos === 'ALL' ? player.positions[0] : selectedPos,
+        timeoutMinutes,
+        expiresAt: Date.now() + timeoutMinutes * 60 * 1000,
+        status: 'pending'
+      };
+
+      appState.invites.unshift(newInvite);
+      saveState();
+      renderCaptainPlayers();
+      showToast(`${player.name} adlı oyuncuya ${timeoutMinutes} dk süreli davet gönderildi!`);
+    }
+
+    // Oyuncu Modu: İl Değişimi
+    function handlePlayerCityChange() {
+      const city = document.getElementById('pl-city').value;
+      const districtSelect = document.getElementById('pl-district');
+      const districts = (CITY_DISTRICTS[city] || []).filter(d => d !== 'Tümü');
+      districtSelect.innerHTML = districts.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    // Oyuncu Modu: Mevki Seçim Kuralları (Sadece Orta Saha & Forvet birlikte seçilebilir)
+    function handlePlayerPositionChange(changedPos) {
+      const checkboxes = Array.from(document.querySelectorAll('input[name="pl-pos"]'));
+      const changedBox = checkboxes.find(cb => cb.value === changedPos);
+
+      if (changedBox && changedBox.checked) {
+        if (changedPos === 'Kaleci' || changedPos === 'Defans') {
+          checkboxes.forEach(cb => {
+            if (cb.value !== changedPos) cb.checked = false;
+          });
+        } else {
+          checkboxes.forEach(cb => {
+            if (cb.value === 'Kaleci' || cb.value === 'Defans') cb.checked = false;
+          });
+        }
+      }
+
+      const checkedPositions = checkboxes.filter(cb => cb.checked).map(cb => cb.value);
+      if (checkedPositions.length === 0 && changedBox) {
+        changedBox.checked = true;
+        checkedPositions.push(changedPos);
+      }
+
+      const primaryPos = checkedPositions.includes(changedPos) ? changedPos : checkedPositions[0];
+      appState.activePrimaryPosition = primaryPos;
+      updatePlayerStyleOptions(primaryPos);
+    }
+
+    function updatePlayerStyleOptions(primaryPos, selectedStyle = null) {
+      const styleSelect = document.getElementById('pl-style');
+      const hintEl = document.getElementById('pl-style-pos-hint');
+      if (!styleSelect) return;
+
+      const styles = POSITION_STYLES[primaryPos] || POSITION_STYLES['Orta Saha'];
+      if (hintEl) hintEl.textContent = `${primaryPos} Rolleri`;
+
+      styleSelect.innerHTML = styles
+        .map(s => `<option value="${s}" ${s === selectedStyle ? 'selected' : ''}>${s}</option>`)
+        .join('');
+    }
+
+    function togglePlayerAvailability() {
+      const selfPlayer = appState.players.find(p => p.isSelf);
+      if (!selfPlayer) return;
+      selfPlayer.available = !selfPlayer.available;
+      saveState();
+      syncPlayerFormUI();
+      showToast(
+        selfPlayer.available
+          ? 'Müsaitlik açıldı! Kaptanlar artık seni havuzda görebilir.'
+          : 'Müsaitlik kapatıldı. Havuzdan gizlendin ve yeni davet almayacaksın.',
+        selfPlayer.available ? 'success' : 'warning'
+      );
+    }
+
+    function syncPlayerFormUI() {
+      const selfPlayer = appState.players.find(p => p.isSelf);
+      if (!selfPlayer) return;
+
+      const toggleBtn = document.getElementById('player-available-toggle');
+      const knob = document.getElementById('player-toggle-knob');
+      const statusLabel = document.getElementById('availability-status-label');
+
+      if (toggleBtn && knob && statusLabel) {
+        toggleBtn.setAttribute('aria-checked', selfPlayer.available ? 'true' : 'false');
+        toggleBtn.className = `relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-ring ${
+          selfPlayer.available ? 'bg-pitch-600' : 'bg-slate-300'
+        }`;
+        knob.className = `pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+          selfPlayer.available ? 'translate-x-5' : 'translate-x-0'
+        }`;
+        statusLabel.textContent = selfPlayer.available ? 'Müsaitim' : 'Müsait Değilim';
+        statusLabel.className = `text-sm font-bold ${selfPlayer.available ? 'text-pitch-700' : 'text-slate-500'}`;
+      }
+
+      document.getElementById('pl-name').value = selfPlayer.name;
+      document.getElementById('pl-city').value = selfPlayer.city;
+      handlePlayerCityChange();
+      document.getElementById('pl-district').value = selfPlayer.district;
+      document.getElementById('pl-date').value = selfPlayer.date;
+      document.getElementById('pl-time').value = selfPlayer.time;
+
+      const checkboxes = Array.from(document.querySelectorAll('input[name="pl-pos"]'));
+      checkboxes.forEach(cb => {
+        cb.checked = selfPlayer.positions.includes(cb.value);
+      });
+
+      const primary = selfPlayer.primaryPosition || selfPlayer.positions[0] || 'Orta Saha';
+      updatePlayerStyleOptions(primary, selfPlayer.style);
+    }
+
+    function savePlayerProfile(event) {
+      event.preventDefault();
+      const selfPlayer = appState.players.find(p => p.isSelf);
+      if (!selfPlayer) return;
+
+      const selectedPositions = Array.from(document.querySelectorAll('input[name="pl-pos"]:checked')).map(cb => cb.value);
+      if (selectedPositions.length === 0) {
+        showToast('En az bir mevki seçmelisin.', 'warning');
+        return;
+      }
+
+      selfPlayer.name = document.getElementById('pl-name').value.trim() || selfPlayer.name;
+      selfPlayer.city = document.getElementById('pl-city').value;
+      selfPlayer.district = document.getElementById('pl-district').value;
+      selfPlayer.date = document.getElementById('pl-date').value;
+      selfPlayer.time = document.getElementById('pl-time').value;
+      selfPlayer.positions = selectedPositions;
+      selfPlayer.primaryPosition = selectedPositions[0];
+      selfPlayer.style = document.getElementById('pl-style').value;
+
+      saveState();
+      showToast(
+        selfPlayer.available
+          ? 'Profilin ve müsaitlik ayarların kaydedildi!'
+          : 'Profilin kaydedildi (Müsaitlik durumun kapalı korundu).'
+      );
+    }
+
+    // Davetler Sekmesi
+    function formatRemaining(ms) {
+      if (ms <= 0) return '00:00';
+      const totalSec = Math.floor(ms / 1000);
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function renderInvites() {
+      const container = document.getElementById('invites-list');
+      if (!container) return;
+
+      const now = Date.now();
+      let stateChanged = false;
+      appState.invites.forEach(inv => {
+        if (inv.status === 'pending' && inv.expiresAt <= now) {
+          inv.status = 'expired';
+          stateChanged = true;
+        }
+      });
+      if (stateChanged) saveState();
+
+      if (appState.invites.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
+            <p class="text-sm font-bold text-slate-700">Henüz aktif veya geçmiş bir davet bulunmuyor.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = appState.invites.map(inv => {
+        const remainingMs = inv.expiresAt - now;
+        const isIncoming = inv.direction === 'incoming';
+
+        let statusBadge = '';
+        let actionControls = '';
+
+        if (inv.status === 'pending') {
+          statusBadge = `
+            <span data-countdown="${inv.id}" class="inline-flex items-center gap-1.5 text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg">
+              ⏳ Kalan Süre: ${formatRemaining(remainingMs)}
+            </span>
+          `;
+
+          if (isIncoming) {
+            actionControls = `
+              <div class="flex flex-wrap gap-2 pt-2">
+                <button type="button" onclick="respondToInvite('${inv.id}', 'accepted')" class="px-4 py-2 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold shadow-sm transition focus-ring">
+                  Daveti Kabul Et
+                </button>
+                <button type="button" onclick="respondToInvite('${inv.id}', 'rejected')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition focus-ring">
+                  Reddet
+                </button>
+                <button type="button" onclick="expireInviteNow('${inv.id}')" class="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
+                  Demo: Süreyi Bitir
+                </button>
+              </div>
+            `;
+          } else {
+            actionControls = `
+              <div class="flex flex-wrap gap-2 pt-2">
+                <button type="button" onclick="respondToInvite('${inv.id}', 'accepted')" class="px-3.5 py-2 rounded-xl bg-pitch-50 hover:bg-pitch-100 text-pitch-800 border border-pitch-300 text-xs font-bold transition focus-ring">
+                  Demo: Oyuncu Onaylasın
+                </button>
+                <button type="button" onclick="expireInviteNow('${inv.id}')" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
+                  Demo: Süreyi Bitir
+                </button>
+              </div>
+            `;
+          }
+        } else if (inv.status === 'accepted') {
+          statusBadge = `<span class="text-xs font-bold bg-pitch-100 text-pitch-800 border border-pitch-300 px-2.5 py-1 rounded-lg">✓ Eşleşme Onaylandı</span>`;
+          actionControls = `
+            <div class="pt-2">
+              <button type="button" onclick="openChatForInvite('${inv.id}')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition focus-ring">
+                Maç Sohbet Odasını Aç →
+              </button>
+            </div>
+          `;
+        } else if (inv.status === 'rejected') {
+          statusBadge = `<span class="text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200 px-2.5 py-1 rounded-lg">✕ Reddedildi</span>`;
+        } else {
+          statusBadge = `<span class="text-xs font-bold bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg">⌛ Zaman Aşımına Uğradı</span>`;
+        }
+
+        return `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md ${
+                isIncoming ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200'
+              }">
+                ${isIncoming ? 'Sana Gelen Davet' : 'Gönderdiğin Davet'}
+              </span>
+              ${statusBadge}
+            </div>
+
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900">${inv.pitchName}</h3>
+              <p class="text-xs text-slate-600 mt-0.5">
+                ${isIncoming ? `Davet Eden: <strong>${inv.captainName}</strong>` : `Davet Edilen Oyuncu: <strong>${inv.playerName}</strong>`}
+                • Mevki: <strong>${inv.position}</strong>
+              </p>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Konum: ${inv.city} / ${inv.district} • Zaman: <strong>${inv.matchTime}</strong>
+              </p>
+            </div>
+
+            ${actionControls}
+          </article>
+        `;
+      }).join('');
+    }
+
+    function respondToInvite(inviteId, decision) {
+      const inv = appState.invites.find(i => i.id === inviteId);
+      if (!inv || inv.status !== 'pending') return;
+
+      inv.status = decision;
+      if (decision === 'accepted') {
+        const invitedPlayer = appState.players.find(p => p.id === inv.playerId);
+        if (invitedPlayer) {
+          invitedPlayer.available = false;
+        }
+
+        const existingChat = appState.chats.find(c => c.inviteId === inv.id);
+        if (!existingChat) {
+          const newChat = {
+            id: 'chat-' + inv.id,
+            inviteId: inv.id,
+            pitchName: inv.pitchName,
+            matchTime: inv.matchTime,
+            position: inv.position,
+            partnerName: inv.direction === 'incoming' ? inv.captainName : inv.playerName,
+            playerId: inv.playerId,
+            ibanShared: false,
+            reliabilityVerified: false,
+            usedReplyIndices: [],
+            messages: [
+              {
+                sender: 'system',
+                text: `Eşleşme tamamlandı! ${inv.playerName} için bu saat aralığındaki müsaitlik otomatik kapatıldı.`,
+                time: new Date().toTimeString().slice(0, 5)
+              }
+            ]
+          };
+          appState.chats.unshift(newChat);
+          appState.activeChatId = newChat.id;
+        }
+        saveState();
+        showToast('Davet onaylandı! Maç sohbet odası açıldı.');
+        switchTab('chat');
+      } else {
+        saveState();
+        renderInvites();
+        showToast('Davet reddedildi.', 'warning');
+      }
+    }
+
+    function expireInviteNow(inviteId) {
+      const inv = appState.invites.find(i => i.id === inviteId);
+      if (!inv || inv.status !== 'pending') return;
+      inv.expiresAt = Date.now() - 1000;
+      inv.status = 'expired';
+      saveState();
+      renderInvites();
+      showToast('Davet süresi doldu ve zaman aşımına uğradı.', 'warning');
+    }
+
+    function openChatForInvite(inviteId) {
+      const chat = appState.chats.find(c => c.inviteId === inviteId);
+      if (chat) appState.activeChatId = chat.id;
+      switchTab('chat');
+    }
+
+    // Sohbet Sekmesi & Zengin Oyuncu Yanıt Havuzu
+    const PARTNER_REPLIES = [
+      'Tamamdır kaptan, not aldım. Maç saatinden 15 dakika önce sahada olurum!',
+      'Harika, kramponları hazırladım. Saha zemini suni çim değil mi?',
+      'IBAN bilgisini aldım, birazdan payıma düşeni gönderip dekontu atarım.',
+      'Eyvallah, kaleye mi geçiyoruz yoksa sahada mı oynayacağım netleşti mi?',
+      'Konumu haritadan kontrol ettim, ulaşım sorunum yok tam vaktinde oradayım.',
+      'Yedek tişört getireyim mi, açık/koyu forma ayrımı var mı?',
+      'Süper oldu, uzun zamandır tempolu bir maç arıyordum. Görüşürüz!',
+      'Arkadaşlardan biri daha eksik olursa haber ver, bir kişi daha ayarlayabilirim.',
+      'Kişi başı ücret gayet uygunmuş, sahada nakit de verebilirim hangisi kolayına gelirse.',
+      'Tamamdır, herhangi bir aksilik olursa buradan hemen yazarım ama kesin geliyorum.',
+      'Otopark durumu nasıl tesisin, arabayla geleceğim de erken çıkayım mı?',
+      'Anlaştık kaptan, kadro tamamlandıysa şimdiden iyi maçlar!'
+    ];
+
+    function renderChats() {
+      const selectorEl = document.getElementById('chat-rooms-selector');
+      const containerEl = document.getElementById('active-chat-container');
+      if (!selectorEl || !containerEl) return;
+
+      if (appState.chats.length === 0) {
+        selectorEl.innerHTML = `<p class="text-xs text-slate-500">Henüz onaylanmış bir maç odası yok.</p>`;
+        containerEl.innerHTML = `
+          <div class="p-8 text-center">
+            <p class="text-sm font-bold text-slate-700">Aktif sohbet odası bulunmuyor.</p>
+            <p class="text-xs text-slate-500 mt-1">Bir oyuncu daveti onaylandığında sohbet ekranı otomatik açılır.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (!appState.chats.some(c => c.id === appState.activeChatId)) {
+        appState.activeChatId = appState.chats[0].id;
+      }
+
+      selectorEl.innerHTML = appState.chats.map(chat => {
+        const isActive = chat.id === appState.activeChatId;
+        return `
+          <button
+            type="button"
+            onclick="selectChatRoom('${chat.id}')"
+            class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold border transition focus-ring ${
+              isActive
+                ? 'bg-pitch-600 text-white border-pitch-600 shadow-sm'
+                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+            }"
+          >
+            ${chat.partnerName} • ${chat.position}
+          </button>
+        `;
+      }).join('');
+
+      const activeChat = appState.chats.find(c => c.id === appState.activeChatId);
+      containerEl.innerHTML = `
+        <!-- Sabitlenmiş Maç Özeti -->
+        <div class="bg-slate-900 text-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-pitch-500"></span>
+              <h3 class="text-sm font-extrabold">${activeChat.partnerName}</h3>
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md">${activeChat.position}</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-1">📍 ${activeChat.pitchName} • 🕒 ${activeChat.matchTime}</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onclick="shareIbanDetails('${activeChat.id}')"
+              ${activeChat.ibanShared ? 'disabled' : ''}
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition focus-ring ${
+                activeChat.ibanShared
+                  ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                  : 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+              }"
+            >
+              ${activeChat.ibanShared ? '✓ IBAN Paylaşıldı' : '💳 IBAN & Ücret Gönder'}
+            </button>
+
+            <button
+              type="button"
+              onclick="verifyPlayerAttendance('${activeChat.id}')"
+              ${activeChat.reliabilityVerified ? 'disabled' : ''}
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition focus-ring ${
+                activeChat.reliabilityVerified
+                  ? 'bg-pitch-900 text-pitch-300 cursor-default'
+                  : 'bg-pitch-600 hover:bg-pitch-500 text-white'
+              }"
+            >
+              ${activeChat.reliabilityVerified ? '★ Katılım Onaylandı' : '✓ Maça Geldi (Puanla)'}
+            </button>
+          </div>
+        </div>
+
+        <!-- Mesaj Akışı -->
+        <div id="chat-messages-scroll" class="p-4 space-y-3 max-h-80 overflow-y-auto bg-slate-50">
+          ${activeChat.messages.map(msg => {
+            if (msg.sender === 'system') {
+              return `
+                <div class="text-center">
+                  <span class="inline-block text-[11px] font-medium bg-slate-200/80 text-slate-700 px-3 py-1 rounded-full">
+                    ${msg.text}
+                  </span>
+                </div>
+              `;
+            }
+            const isMe = msg.sender === 'me';
+            return `
+              <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                <div class="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm whitespace-pre-line shadow-sm ${
+                  isMe ? 'bg-pitch-600 text-white rounded-br-sm' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm'
+                }">
+                  ${msg.text}
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1 px-1">${msg.time}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Mesaj Gönderme Formu -->
+        <form onsubmit="sendChatMessage(event, '${activeChat.id}')" class="p-3 bg-white border-t border-slate-200 flex gap-2">
+          <input
+            type="text"
+            id="chat-input-field"
+            placeholder="Maç saati, forma rengi veya konum hakkında mesaj yaz..."
+            class="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm focus:bg-white focus:border-pitch-600 focus-ring"
+          />
+          <button
+            type="submit"
+            class="px-4 py-2.5 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs sm:text-sm font-bold transition focus-ring"
+          >
+            Gönder
+          </button>
+        </form>
+      `;
+
+      const scrollEl = document.getElementById('chat-messages-scroll');
+      if (scrollEl) scrollEl.scrollTop = scrollEl.scrollHeight;
+    }
+
+    function selectChatRoom(chatId) {
+      appState.activeChatId = chatId;
+      renderChats();
+    }
+
+    function shareIbanDetails(chatId) {
+      const chat = appState.chats.find(c => c.id === chatId);
+      if (!chat || chat.ibanShared) return;
+
+      chat.ibanShared = true;
+      const ibanMsg = `📋 Maç Detayları:\n• Saha: ${chat.pitchName}\n• Saat: ${chat.matchTime}\n• Kişi Başı Ücret: 180 TL\n• IBAN: TR45 0006 2000 0000 1234 5678 90\n• Not: Maçtan 15 dk önce sahada olalım.`;
+      appendMessageAndSimulateReply(chat, ibanMsg, true);
+    }
+
+    function sendChatMessage(event, chatId) {
+      event.preventDefault();
+      const input = document.getElementById('chat-input-field');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const chat = appState.chats.find(c => c.id === chatId);
+      if (!chat) return;
+
+      input.value = '';
+      appendMessageAndSimulateReply(chat, text, false);
+    }
+
+    function appendMessageAndSimulateReply(chat, text, isIban) {
+      const nowTime = new Date().toTimeString().slice(0, 5);
+      chat.messages.push({ sender: 'me', text, time: nowTime });
+      saveState();
+      renderChats();
+
+      setTimeout(() => {
+        const used = chat.usedReplyIndices || [];
+        let candidateIndices = PARTNER_REPLIES.map((_, idx) => idx).filter(idx => !used.includes(idx));
+        if (candidateIndices.length === 0) {
+          chat.usedReplyIndices = [];
+          candidateIndices = PARTNER_REPLIES.map((_, idx) => idx);
+        }
+
+        let chosenIdx = isIban && !used.includes(2)
+          ? 2
+          : candidateIndices[Math.floor(Math.random() * candidateIndices.length)];
+
+        chat.usedReplyIndices = [...(chat.usedReplyIndices || []), chosenIdx];
+        chat.messages.push({
+          sender: 'partner',
+          text: PARTNER_REPLIES[chosenIdx],
+          time: new Date().toTimeString().slice(0, 5)
+        });
+        saveState();
+        if (appState.activeTab === 'chat' && appState.activeChatId === chat.id) {
+          renderChats();
+        }
+      }, 650);
+    }
+
+    function verifyPlayerAttendance(chatId) {
+      const chat = appState.chats.find(c => c.id === chatId);
+      if (!chat || chat.reliabilityVerified) return;
+
+      chat.reliabilityVerified = true;
+      const player = appState.players.find(p => p.id === chat.playerId);
+      if (player) {
+        player.matches += 1;
+        player.rating = Math.min(5.0, +(player.rating + 0.05).toFixed(2));
+      }
+      chat.messages.push({
+        sender: 'system',
+        text: `★ ${chat.partnerName} maça katılım onayı aldı! Güvenilirlik puanı güncellendi.`,
+        time: new Date().toTimeString().slice(0, 5)
+      });
+      saveState();
+      renderChats();
+      showToast(`${chat.partnerName} için katılım ve güvenilirlik puanı onaylandı!`);
+    }
+
+    function startCountdownTicker() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const now = Date.now();
+        let expiredAny = false;
+        appState.invites.forEach(inv => {
+          if (inv.status === 'pending') {
+            if (inv.expiresAt <= now) {
+              inv.status = 'expired';
+              expiredAny = true;
+            } else if (appState.activeTab === 'invites') {
+              const badge = document.querySelector(`[data-countdown="${inv.id}"]`);
+              if (badge) badge.textContent = `⏳ Kalan Süre: ${formatRemaining(inv.expiresAt - now)}`;
+            }
+          }
+        });
+        if (expiredAny) {
+          saveState();
+          if (appState.activeTab === 'invites') renderInvites();
+        }
+      }, 1000);
+    }
+
+    function initUI() {
+      handleCaptainCityChange();
+      renderCaptainTimePills();
+      handlePlayerCityChange();
+      updateBadges();
+      switchTab(appState.activeTab || 'captain');
+      startCountdownTicker();
+    }
+
+    window.addEventListener('DOMContentLoaded', initUI);
+  </script>
+</body>
+</html>

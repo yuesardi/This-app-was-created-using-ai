@@ -34,7 +34,6 @@
     };
   </script>
   <style>
-    /* Özel kaydırma çubuğu ve erişilebilir odak halkaları */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -63,7 +62,6 @@
       <!-- Marka Logosu -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <!-- Özel 1Eksik Amblemi (GitHub'da 1Eksik.jpg varsa onu yükler, yoksa özel vektör amblemi gösterir) -->
           <div class="relative w-11 h-11 rounded-xl bg-[#18181b] flex items-center justify-center shadow-inner border border-zinc-700/80 overflow-hidden shrink-0" aria-hidden="true">
             <img
               src="1Eksik.jpg"
@@ -72,15 +70,12 @@
               class="w-full h-full object-cover scale-125"
             />
             <svg style="display:none;" class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Sol Alt Yeşil Korner Köşesi & Yay -->
               <path d="M18 46 V82 H54 L18 46 Z" stroke="#39e628" stroke-width="5" stroke-linejoin="round"/>
               <path d="M18 72 A10 10 0 0 1 28 82" stroke="#39e628" stroke-width="4" stroke-linecap="round"/>
               <path d="M31 59 A10 10 0 0 1 41 69" stroke="#39e628" stroke-width="4" stroke-linecap="round"/>
-              <!-- Sağ Üst Beyaz Korner Köşesi & Yay -->
               <path d="M82 54 V18 H46 L82 54 Z" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
               <path d="M82 28 A10 10 0 0 1 72 18" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
               <path d="M69 41 A10 10 0 0 1 59 31" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-              <!-- Futbol Topu Deseni (Sol Üst Yeşil, Sağ Alt Beyaz) -->
               <path d="M23 43 A28 28 0 0 1 43 23" stroke="#39e628" stroke-width="4.5" stroke-linecap="round"/>
               <path d="M77 57 A28 28 0 0 1 57 77" stroke="#39e628" stroke-width="4.5" stroke-linecap="round"/>
               <polygon points="44,39 52,44 49,53 39,53 36,44" stroke="#39e628" stroke-width="4" stroke-linejoin="round"/>
@@ -180,7 +175,6 @@
     <!-- 1. SEKME: KAPTAN MODU (OYUNCU ARA & DAVET GÖNDER)          -->
     <!-- ========================================================= -->
     <section id="view-captain" aria-labelledby="heading-captain" class="space-y-6">
-      <!-- Kaptan Arama ve Kriter Belirleme Kartı -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
           <div>
@@ -207,9 +201,7 @@
           <!-- İlçe Seçimi -->
           <div>
             <label for="cap-district" class="block text-sm font-semibold text-slate-700 mb-1.5">İlçe</label>
-            <select id="cap-district" onchange="renderCaptainPlayers()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
-              <!-- JS tarafından dinamik doldurulacak -->
-            </select>
+            <select id="cap-district" onchange="renderCaptainPlayers()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring"></select>
           </div>
 
           <!-- Halı Saha Adı -->
@@ -236,7 +228,7 @@
             </select>
           </div>
 
-          <!-- Maç Tarihi ve Saati (Önce Gün, Altta Saat Aralığı Seçenekleri) -->
+          <!-- Maç Tarihi ve Saati -->
           <div class="sm:col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <label for="cap-day" class="block text-sm font-bold text-slate-800">Maç Günü & Saat Aralığı</label>
@@ -252,9 +244,7 @@
 
             <div>
               <span class="block text-xs font-semibold text-slate-500 mb-2">Saat Aralığı Seçin:</span>
-              <div id="cap-time-pills" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <!-- JS tarafından müsaitlik saatleriyle aynı seçeneklerle doldurulacak -->
-              </div>
+              <div id="cap-time-pills" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
               <input type="hidden" id="cap-time" value="21:00 - 23:00" />
             </div>
           </div>
@@ -311,7 +301,7 @@
             </p>
           </div>
 
-          <!-- Müsaitim Anahtarı (Accessible Switch) -->
+          <!-- Müsaitim Anahtarı -->
           <div class="flex items-center gap-3 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200">
             <span id="availability-status-label" class="text-sm font-bold text-pitch-700">Müsaitim</span>
             <button
@@ -334,7 +324,6 @@
         <!-- Oyuncu Profili & Müsaitlik Formu -->
         <form id="player-profile-form" onsubmit="savePlayerProfile(event)" class="mt-5 space-y-5">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Oyuncu Adı -->
             <div class="sm:col-span-2">
               <label for="pl-name" class="block text-sm font-semibold text-slate-700 mb-1.5">Ad Soyad / Takma Ad</label>
               <input
@@ -345,7 +334,6 @@
               />
             </div>
 
-            <!-- Müsait Olduğu İl -->
             <div>
               <label for="pl-city" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Olduğun İl</label>
               <select id="pl-city" onchange="handlePlayerCityChange()" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
@@ -356,15 +344,11 @@
               </select>
             </div>
 
-            <!-- Müsait Olduğu İlçe -->
             <div>
               <label for="pl-district" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Olduğun İlçe</label>
-              <select id="pl-district" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
-                <!-- JS tarafından dinamik doldurulacak -->
-              </select>
+              <select id="pl-district" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring"></select>
             </div>
 
-            <!-- Tarih Seçimi -->
             <div>
               <label for="pl-date" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Gün</label>
               <select id="pl-date" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
@@ -378,7 +362,6 @@
               </select>
             </div>
 
-            <!-- Saat Aralığı -->
             <div>
               <label for="pl-time" class="block text-sm font-semibold text-slate-700 mb-1.5">Müsait Saat Aralığı</label>
               <select id="pl-time" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
@@ -391,7 +374,7 @@
             </div>
           </div>
 
-          <!-- Oynayabildiği Mevkiler (Yalnızca Orta Saha & Forvet birlikte seçilebilir) -->
+          <!-- Oynayabildiği Mevkiler -->
           <div>
             <span class="block text-sm font-semibold text-slate-700 mb-2">Oynayabildiğin Mevkiler <span class="text-xs font-normal text-slate-500">(Sadece Orta Saha & Forvet birlikte seçilebilir)</span></span>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="pl-positions-group">
@@ -430,9 +413,7 @@
                 Orta Saha Rolleri
               </span>
             </div>
-            <select id="pl-style" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring">
-              <!-- JS tarafından seçili mevkiye göre dinamik doldurulacak -->
-            </select>
+            <select id="pl-style" class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:bg-white focus:border-pitch-600 focus-ring"></select>
           </div>
 
           <!-- Kaydet Butonu -->
@@ -470,13 +451,11 @@
     <!-- 4. SEKME: UYGULAMA İÇİ MAÇ SOHBETİ (CHAT)                 -->
     <!-- ========================================================= -->
     <section id="view-chat" aria-labelledby="heading-chat" class="hidden space-y-4">
-      <!-- Aktif Eşleşmeler Listesi -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
         <h2 id="heading-chat" class="text-base font-bold text-slate-900 mb-3">Onaylanan Maç Odaları</h2>
         <div id="chat-rooms-selector" class="flex gap-2 overflow-x-auto pb-1"></div>
       </div>
 
-      <!-- Aktif Sohbet Penceresi -->
       <div id="active-chat-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col"></div>
     </section>
 
@@ -491,9 +470,19 @@
   <!-- JAVASCRIPT UYGULAMA MANTIĞI                              -->
   <!-- ========================================================= -->
   <script>
-    const STORAGE_KEY = '1eksik_prototype_state_v3';
+    const STORAGE_KEY = '1eksik_prototype_state_v4';
 
-    // Başlangıç Müsait Oyuncu Havuzu
+    // XSS Koruması için HTML Kaçış Yardımcı Fonksiyonu
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     const INITIAL_PLAYERS = [
       {
         id: 'pl-self',
@@ -722,7 +711,6 @@
       }
     ];
 
-    // Başlangıç Örnek Davetler ve Hazır Sohbet Odaları
     function createInitialState() {
       const now = Date.now();
       return {
@@ -878,7 +866,6 @@
     let appState = loadState();
     let timerInterval = null;
 
-    // İl -> İlçe Seçenekleri
     const CITY_DISTRICTS = {
       'İzmir': ['Tümü', 'Bornova', 'Karşıyaka', 'Konak', 'Buca', 'Alsancak', 'Bayraklı', 'Gaziemir'],
       'Ankara': ['Tümü', 'Çankaya', 'Yenimahalle', 'Keçiören', 'Etimesgut', 'Mamak'],
@@ -886,7 +873,6 @@
       'İstanbul (Avrupa)': ['Tümü', 'Beşiktaş', 'Şişli', 'Bakırköy', 'Sarıyer', 'Bahçelievler', 'Başakşehir']
     };
 
-    // Mevkiye Göre Dinamik Oyun Tarzları
     const POSITION_STYLES = {
       'Kaleci': ['Önde & Libero Kaleci', 'Çizgide & Risksiz Sabit'],
       'Defans': ['Müdahaleden Kaçınmaz', 'Geriden Oyun Kurucu', 'Duvar Stoper', 'İki Yönlü Bek'],
@@ -904,7 +890,17 @@
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (
+            parsed &&
+            Array.isArray(parsed.players) &&
+            Array.isArray(parsed.invites) &&
+            Array.isArray(parsed.chats)
+          ) {
+            return parsed;
+          }
+        }
       } catch (e) {
         console.error('Depolama okuma hatası:', e);
       }
@@ -984,18 +980,16 @@
       if (tabName === 'chat') renderChats();
     }
 
-    // Kaptan Modu: İl değiştiğinde ilçeleri güncelle
     function handleCaptainCityChange() {
       const city = document.getElementById('cap-city').value;
       const districtSelect = document.getElementById('cap-district');
       const districts = CITY_DISTRICTS[city] || ['Tümü'];
       districtSelect.innerHTML = districts
-        .map(d => `<option value="${d}">${d === 'Tümü' ? 'Tüm İlçeler' : d}</option>`)
+        .map(d => `<option value="${escapeHTML(d)}">${d === 'Tümü' ? 'Tüm İlçeler' : escapeHTML(d)}</option>`)
         .join('');
       renderCaptainPlayers();
     }
 
-    // Kaptan Modu: Saat Aralığı Seçim Butonları
     function renderCaptainTimePills() {
       const container = document.getElementById('cap-time-pills');
       const hiddenInput = document.getElementById('cap-time');
@@ -1007,14 +1001,14 @@
         return `
           <button
             type="button"
-            onclick="selectCaptainTime('${slot}')"
+            onclick="selectCaptainTime('${escapeHTML(slot)}')"
             class="px-3 py-2 rounded-xl text-xs font-bold border transition focus-ring ${
               active
                 ? 'bg-pitch-600 text-white border-pitch-600 shadow-sm'
                 : 'bg-white text-slate-700 border-slate-300 hover:border-pitch-500'
             }"
           >
-            ${slot}
+            ${escapeHTML(slot)}
           </button>
         `;
       }).join('');
@@ -1026,7 +1020,6 @@
       renderCaptainPlayers();
     }
 
-    // Kaptan Modu: Uygun Oyuncuları Filtrele ve Listele
     function renderCaptainPlayers() {
       const listEl = document.getElementById('captain-players-list');
       const countEl = document.getElementById('available-count');
@@ -1070,7 +1063,7 @@
         let actionButton = `
           <button
             type="button"
-            onclick="sendInviteToPlayer('${player.id}')"
+            onclick="sendInviteToPlayer('${escapeHTML(player.id)}')"
             class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold shadow-sm transition focus-ring"
           >
             Maça Davet Et
@@ -1109,28 +1102,28 @@
           <article class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-pitch-300 transition">
             <div class="space-y-2">
               <div class="flex flex-wrap items-center gap-2">
-                <h4 class="text-base font-extrabold text-slate-900">${player.name}</h4>
+                <h4 class="text-base font-extrabold text-slate-900">${escapeHTML(player.name)}</h4>
                 <span class="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
-                  ★ ${player.rating.toFixed(1)} <span class="font-normal text-amber-700">(${player.matches} maç)</span>
+                  ★ ${Number(player.rating).toFixed(1)} <span class="font-normal text-amber-700">(${Number(player.matches)} maç)</span>
                 </span>
                 <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg">
-                  ${player.city} / ${player.district}
+                  ${escapeHTML(player.city)} / ${escapeHTML(player.district)}
                 </span>
               </div>
 
               <div class="flex flex-wrap items-center gap-1.5">
                 ${player.positions.map(pos => `
                   <span class="text-xs font-bold bg-pitch-50 text-pitch-800 border border-pitch-200 px-2.5 py-0.5 rounded-lg">
-                    ${pos}
+                    ${escapeHTML(pos)}
                   </span>
                 `).join('')}
                 <span class="text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-lg">
-                  Rol: ${player.style}
+                  Rol: ${escapeHTML(player.style)}
                 </span>
               </div>
 
               <p class="text-xs text-slate-500">
-                Müsaitlik: <strong class="text-slate-700">${player.date} • ${player.time}</strong>
+                Müsaitlik: <strong class="text-slate-700">${escapeHTML(player.date)} • ${escapeHTML(player.time)}</strong>
               </p>
             </div>
 
@@ -1142,11 +1135,18 @@
       }).join('');
     }
 
-    // Kaptan Modu: Oyuncuya Davet Gönder
     function sendInviteToPlayer(playerId) {
       const player = appState.players.find(p => p.id === playerId);
       if (!player || !player.available) {
         showToast('Bu oyuncu şu anda müsait değil.', 'warning');
+        return;
+      }
+
+      const hasPendingInvite = appState.invites.some(
+        inv => inv.playerId === player.id && inv.status === 'pending' && inv.direction === 'outgoing'
+      );
+      if (hasPendingInvite) {
+        showToast('Bu oyuncuya zaten aktif bir davet gönderilmiş.', 'warning');
         return;
       }
 
@@ -1180,15 +1180,13 @@
       showToast(`${player.name} adlı oyuncuya ${timeoutMinutes} dk süreli davet gönderildi!`);
     }
 
-    // Oyuncu Modu: İl Değişimi
     function handlePlayerCityChange() {
       const city = document.getElementById('pl-city').value;
       const districtSelect = document.getElementById('pl-district');
       const districts = (CITY_DISTRICTS[city] || []).filter(d => d !== 'Tümü');
-      districtSelect.innerHTML = districts.map(d => `<option value="${d}">${d}</option>`).join('');
+      districtSelect.innerHTML = districts.map(d => `<option value="${escapeHTML(d)}">${escapeHTML(d)}</option>`).join('');
     }
 
-    // Oyuncu Modu: Mevki Seçim Kuralları (Sadece Orta Saha & Forvet birlikte seçilebilir)
     function handlePlayerPositionChange(changedPos) {
       const checkboxes = Array.from(document.querySelectorAll('input[name="pl-pos"]'));
       const changedBox = checkboxes.find(cb => cb.value === changedPos);
@@ -1211,9 +1209,16 @@
         checkedPositions.push(changedPos);
       }
 
-      const primaryPos = checkedPositions.includes(changedPos) ? changedPos : checkedPositions[0];
+      const currentStyle = document.getElementById('pl-style').value;
+      const currentPosStyles = POSITION_STYLES[appState.activePrimaryPosition] || [];
+      const keepCurrentRole = checkedPositions.includes(appState.activePrimaryPosition) && currentPosStyles.includes(currentStyle);
+
+      const primaryPos = keepCurrentRole
+        ? appState.activePrimaryPosition
+        : (checkedPositions.includes(changedPos) ? changedPos : checkedPositions[0]);
+
       appState.activePrimaryPosition = primaryPos;
-      updatePlayerStyleOptions(primaryPos);
+      updatePlayerStyleOptions(primaryPos, keepCurrentRole ? currentStyle : null);
     }
 
     function updatePlayerStyleOptions(primaryPos, selectedStyle = null) {
@@ -1225,7 +1230,7 @@
       if (hintEl) hintEl.textContent = `${primaryPos} Rolleri`;
 
       styleSelect.innerHTML = styles
-        .map(s => `<option value="${s}" ${s === selectedStyle ? 'selected' : ''}>${s}</option>`)
+        .map(s => `<option value="${escapeHTML(s)}" ${s === selectedStyle ? 'selected' : ''}>${escapeHTML(s)}</option>`)
         .join('');
     }
 
@@ -1238,7 +1243,7 @@
       showToast(
         selfPlayer.available
           ? 'Müsaitlik açıldı! Kaptanlar artık seni havuzda görebilir.'
-          : 'Müsaitlik kapatıldı. Havuzdan gizlendin ve yeni davet almayacaksın.',
+          : 'Müsaitlik kapatıldı. Havuzdan gizlendin ve davet onayı durduruldu.',
         selfPlayer.available ? 'success' : 'warning'
       );
     }
@@ -1275,7 +1280,10 @@
         cb.checked = selfPlayer.positions.includes(cb.value);
       });
 
-      const primary = selfPlayer.primaryPosition || selfPlayer.positions[0] || 'Orta Saha';
+      const primary = selfPlayer.primaryPosition && selfPlayer.positions.includes(selfPlayer.primaryPosition)
+        ? selfPlayer.primaryPosition
+        : (selfPlayer.positions[0] || 'Orta Saha');
+      appState.activePrimaryPosition = primary;
       updatePlayerStyleOptions(primary, selfPlayer.style);
     }
 
@@ -1290,13 +1298,22 @@
         return;
       }
 
+      const primaryPos = selectedPositions.includes(appState.activePrimaryPosition)
+        ? appState.activePrimaryPosition
+        : selectedPositions[0];
+
+      const orderedPositions = [
+        primaryPos,
+        ...selectedPositions.filter(p => p !== primaryPos)
+      ];
+
       selfPlayer.name = document.getElementById('pl-name').value.trim() || selfPlayer.name;
       selfPlayer.city = document.getElementById('pl-city').value;
       selfPlayer.district = document.getElementById('pl-district').value;
       selfPlayer.date = document.getElementById('pl-date').value;
       selfPlayer.time = document.getElementById('pl-time').value;
-      selfPlayer.positions = selectedPositions;
-      selfPlayer.primaryPosition = selectedPositions[0];
+      selfPlayer.positions = orderedPositions;
+      selfPlayer.primaryPosition = primaryPos;
       selfPlayer.style = document.getElementById('pl-style').value;
 
       saveState();
@@ -1307,7 +1324,6 @@
       );
     }
 
-    // Davetler Sekmesi
     function formatRemaining(ms) {
       if (ms <= 0) return '00:00';
       const totalSec = Math.floor(ms / 1000);
@@ -1339,6 +1355,9 @@
         return;
       }
 
+      const selfPlayer = appState.players.find(p => p.isSelf);
+      const selfAvailable = selfPlayer ? selfPlayer.available : true;
+
       container.innerHTML = appState.invites.map(inv => {
         const remainingMs = inv.expiresAt - now;
         const isIncoming = inv.direction === 'incoming';
@@ -1348,21 +1367,30 @@
 
         if (inv.status === 'pending') {
           statusBadge = `
-            <span data-countdown="${inv.id}" class="inline-flex items-center gap-1.5 text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg">
+            <span data-countdown="${escapeHTML(inv.id)}" class="inline-flex items-center gap-1.5 text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-lg">
               ⏳ Kalan Süre: ${formatRemaining(remainingMs)}
             </span>
           `;
 
           if (isIncoming) {
             actionControls = `
-              <div class="flex flex-wrap gap-2 pt-2">
-                <button type="button" onclick="respondToInvite('${inv.id}', 'accepted')" class="px-4 py-2 rounded-xl bg-pitch-600 hover:bg-pitch-700 text-white text-xs font-bold shadow-sm transition focus-ring">
-                  Daveti Kabul Et
+              <div class="flex flex-wrap items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onclick="respondToInvite('${escapeHTML(inv.id)}', 'accepted')"
+                  ${!selfAvailable ? 'disabled' : ''}
+                  class="px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition focus-ring ${
+                    selfAvailable
+                      ? 'bg-pitch-600 hover:bg-pitch-700 text-white'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }"
+                >
+                  ${selfAvailable ? 'Daveti Kabul Et' : 'Müsaitlik Kapalı (Kabul Edilemez)'}
                 </button>
-                <button type="button" onclick="respondToInvite('${inv.id}', 'rejected')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition focus-ring">
+                <button type="button" onclick="respondToInvite('${escapeHTML(inv.id)}', 'rejected')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition focus-ring">
                   Reddet
                 </button>
-                <button type="button" onclick="expireInviteNow('${inv.id}')" class="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
+                <button type="button" onclick="expireInviteNow('${escapeHTML(inv.id)}')" class="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
                   Demo: Süreyi Bitir
                 </button>
               </div>
@@ -1370,10 +1398,10 @@
           } else {
             actionControls = `
               <div class="flex flex-wrap gap-2 pt-2">
-                <button type="button" onclick="respondToInvite('${inv.id}', 'accepted')" class="px-3.5 py-2 rounded-xl bg-pitch-50 hover:bg-pitch-100 text-pitch-800 border border-pitch-300 text-xs font-bold transition focus-ring">
+                <button type="button" onclick="respondToInvite('${escapeHTML(inv.id)}', 'accepted')" class="px-3.5 py-2 rounded-xl bg-pitch-50 hover:bg-pitch-100 text-pitch-800 border border-pitch-300 text-xs font-bold transition focus-ring">
                   Demo: Oyuncu Onaylasın
                 </button>
-                <button type="button" onclick="expireInviteNow('${inv.id}')" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
+                <button type="button" onclick="expireInviteNow('${escapeHTML(inv.id)}')" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold transition focus-ring">
                   Demo: Süreyi Bitir
                 </button>
               </div>
@@ -1383,7 +1411,7 @@
           statusBadge = `<span class="text-xs font-bold bg-pitch-100 text-pitch-800 border border-pitch-300 px-2.5 py-1 rounded-lg">✓ Eşleşme Onaylandı</span>`;
           actionControls = `
             <div class="pt-2">
-              <button type="button" onclick="openChatForInvite('${inv.id}')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition focus-ring">
+              <button type="button" onclick="openChatForInvite('${escapeHTML(inv.id)}')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition focus-ring">
                 Maç Sohbet Odasını Aç →
               </button>
             </div>
@@ -1406,13 +1434,12 @@
             </div>
 
             <div>
-              <h3 class="text-base font-extrabold text-slate-900">${inv.pitchName}</h3>
+              <h3 class="text-base font-extrabold text-slate-900">${escapeHTML(inv.pitchName)}</h3>
               <p class="text-xs text-slate-600 mt-0.5">
-                ${isIncoming ? `Davet Eden: <strong>${inv.captainName}</strong>` : `Davet Edilen Oyuncu: <strong>${inv.playerName}</strong>`}
-                • Mevki: <strong>${inv.position}</strong>
+                ${isIncoming ? `Davet Eden: <strong>${escapeHTML(inv.captainName)}</strong>` : `Davet Edilen Oyuncu: <strong>${escapeHTML(inv.playerName)}</strong>`} • Mevki: <strong>${escapeHTML(inv.position)}</strong>
               </p>
               <p class="text-xs text-slate-500 mt-0.5">
-                Konum: ${inv.city} / ${inv.district} • Zaman: <strong>${inv.matchTime}</strong>
+                Konum: ${escapeHTML(inv.city)} / ${escapeHTML(inv.district)} • Zaman: <strong>${escapeHTML(inv.matchTime)}</strong>
               </p>
             </div>
 
@@ -1426,12 +1453,27 @@
       const inv = appState.invites.find(i => i.id === inviteId);
       if (!inv || inv.status !== 'pending') return;
 
+      if (decision === 'accepted' && inv.direction === 'incoming') {
+        const selfPlayer = appState.players.find(p => p.isSelf);
+        if (selfPlayer && !selfPlayer.available) {
+          showToast('Müsaitlik durumun kapalıyken davet kabul edemezsin. Önce Oyuncu Modundan müsaitliği aç.', 'warning');
+          return;
+        }
+      }
+
       inv.status = decision;
       if (decision === 'accepted') {
         const invitedPlayer = appState.players.find(p => p.id === inv.playerId);
         if (invitedPlayer) {
           invitedPlayer.available = false;
         }
+
+        // Aynı oyuncuya ait diğer bekleyen çakışan davetleri otomatik kapat
+        appState.invites.forEach(other => {
+          if (other.id !== inv.id && other.playerId === inv.playerId && other.status === 'pending' && other.matchTime === inv.matchTime) {
+            other.status = 'rejected';
+          }
+        });
 
         const existingChat = appState.chats.find(c => c.inviteId === inv.id);
         if (!existingChat) {
@@ -1483,7 +1525,6 @@
       switchTab('chat');
     }
 
-    // Sohbet Sekmesi & Zengin Oyuncu Yanıt Havuzu
     const PARTNER_REPLIES = [
       'Tamamdır kaptan, not aldım. Maç saatinden 15 dakika önce sahada olurum!',
       'Harika, kramponları hazırladım. Saha zemini suni çim değil mi?',
@@ -1524,35 +1565,34 @@
         return `
           <button
             type="button"
-            onclick="selectChatRoom('${chat.id}')"
+            onclick="selectChatRoom('${escapeHTML(chat.id)}')"
             class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold border transition focus-ring ${
               isActive
                 ? 'bg-pitch-600 text-white border-pitch-600 shadow-sm'
                 : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
             }"
           >
-            ${chat.partnerName} • ${chat.position}
+            ${escapeHTML(chat.partnerName)} • ${escapeHTML(chat.position)}
           </button>
         `;
       }).join('');
 
       const activeChat = appState.chats.find(c => c.id === appState.activeChatId);
       containerEl.innerHTML = `
-        <!-- Sabitlenmiş Maç Özeti -->
         <div class="bg-slate-900 text-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-pitch-500"></span>
-              <h3 class="text-sm font-extrabold">${activeChat.partnerName}</h3>
-              <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md">${activeChat.position}</span>
+              <h3 class="text-sm font-extrabold">${escapeHTML(activeChat.partnerName)}</h3>
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md">${escapeHTML(activeChat.position)}</span>
             </div>
-            <p class="text-xs text-slate-300 mt-1">📍 ${activeChat.pitchName} • 🕒 ${activeChat.matchTime}</p>
+            <p class="text-xs text-slate-300 mt-1">📍 ${escapeHTML(activeChat.pitchName)} • 🕒 ${escapeHTML(activeChat.matchTime)}</p>
           </div>
 
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
-              onclick="shareIbanDetails('${activeChat.id}')"
+              onclick="shareIbanDetails('${escapeHTML(activeChat.id)}')"
               ${activeChat.ibanShared ? 'disabled' : ''}
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition focus-ring ${
                 activeChat.ibanShared
@@ -1565,7 +1605,7 @@
 
             <button
               type="button"
-              onclick="verifyPlayerAttendance('${activeChat.id}')"
+              onclick="verifyPlayerAttendance('${escapeHTML(activeChat.id)}')"
               ${activeChat.reliabilityVerified ? 'disabled' : ''}
               class="px-3 py-1.5 rounded-lg text-xs font-bold transition focus-ring ${
                 activeChat.reliabilityVerified
@@ -1578,14 +1618,13 @@
           </div>
         </div>
 
-        <!-- Mesaj Akışı -->
         <div id="chat-messages-scroll" class="p-4 space-y-3 max-h-80 overflow-y-auto bg-slate-50">
           ${activeChat.messages.map(msg => {
             if (msg.sender === 'system') {
               return `
                 <div class="text-center">
                   <span class="inline-block text-[11px] font-medium bg-slate-200/80 text-slate-700 px-3 py-1 rounded-full">
-                    ${msg.text}
+                    ${escapeHTML(msg.text)}
                   </span>
                 </div>
               `;
@@ -1595,17 +1634,14 @@
               <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
                 <div class="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm whitespace-pre-line shadow-sm ${
                   isMe ? 'bg-pitch-600 text-white rounded-br-sm' : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm'
-                }">
-                  ${msg.text}
-                </div>
-                <span class="text-[10px] text-slate-400 mt-1 px-1">${msg.time}</span>
+                }">${escapeHTML(msg.text)}</div>
+                <span class="text-[10px] text-slate-400 mt-1 px-1">${escapeHTML(msg.time)}</span>
               </div>
             `;
           }).join('')}
         </div>
 
-        <!-- Mesaj Gönderme Formu -->
-        <form onsubmit="sendChatMessage(event, '${activeChat.id}')" class="p-3 bg-white border-t border-slate-200 flex gap-2">
+        <form onsubmit="sendChatMessage(event, '${escapeHTML(activeChat.id)}')" class="p-3 bg-white border-t border-slate-200 flex gap-2">
           <input
             type="text"
             id="chat-input-field"
@@ -1666,7 +1702,7 @@
           candidateIndices = PARTNER_REPLIES.map((_, idx) => idx);
         }
 
-        let chosenIdx = isIban && !used.includes(2)
+        const chosenIdx = isIban && !used.includes(2)
           ? 2
           : candidateIndices[Math.floor(Math.random() * candidateIndices.length)];
 
